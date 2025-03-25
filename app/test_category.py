@@ -3,8 +3,9 @@ import uuid
 from uuid import UUID
 
 import pytest
+from unicodedata import category
 
-from category import Category
+from app.category import Category
 
 class TestCategory:
     def test_name_is_required(self):
@@ -23,11 +24,11 @@ class TestCategory:
         category = Category(name="Filme")
         assert category.name == "Filme"
         assert category.description == ""
-        assert category.is_active == True
+        assert category.is_active is True
 
     def test_category_is_created_as_active_by_default(self):
         category = Category("Filme")
-        assert category.is_active == True
+        assert category.is_active is True
 
     def test_category_is_created_with_provided_values(self):
         cat_id = uuid.uuid4()
@@ -37,18 +38,69 @@ class TestCategory:
             description="generic film",
             is_active=False
         )
-        self.assertEqual(category.id, cat_id)
-        self.assertEqual(category.name, "Filme")
-        self.assertEqual(category.description, "generic film")
-        self.assertEqual(category.is_active, False)
+
+        assert category.id == cat_id
+        assert category.name == "Filme"
+        assert category.description == "generic film"
+        assert category.is_active is False
 
     def test_category_str_method_return_category(self):
         category = Category(name="Filme", description="generic film")
-        self.assertEqual(str(category), f"{category.name} - {category.description} ({category.is_active})")
+        assert str(category) == f"{category.name} - {category.description} ({category.is_active})"
 
     def test_category_repr_method_return_category(self):
         category = Category(name="Filme", description="generic film")
-        self.assertEqual(repr(category), f"<Category {category.name} ({category.id})>")
+        assert repr(category) == f"<Category {category.name} ({category.id})>"
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_cannot_create_category_with_empty_name(self):
+        with pytest.raises(ValueError, match="name cannot be empty"):
+            Category(name="")
+
+class TestUpdateCategory:
+    def test_update_category_with_name_and_description(self):
+        category = Category(name="Filme", description="Filmes em geral")
+
+        category.update_category(name="Série", description="Séries em geral")
+
+        assert category.name == "Série"
+        assert category.description == "Séries em geral"
+
+class TestActivate:
+    def test_activate_inactive_category(self):
+        category = Category(
+            name="Filme",
+            description="Filmes em geral",
+            is_active=False
+        )
+        category.activate()
+
+        assert category.is_active == True
+
+    def test_activate_active_category(self):
+        category = Category(
+            name="Filme",
+            description="Filmes em geral",
+            is_active=True
+        )
+        category.activate()
+
+        assert category.is_active == True
+
+class TestDeactivate:
+    def test_deactivate_active_category(self):
+        category = Category(
+            name="Filme", description="Filmes em geral"
+        )
+        category.deactivate()
+
+        assert category.is_active == False
+
+    def test_deactivate_inactive_category(self):
+        category = Category(
+            name="Filme",
+            description="Filmes em geral",
+            is_active=False
+        )
+        category.deactivate()
+
+        assert category.is_active == False
