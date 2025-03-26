@@ -1,11 +1,9 @@
-import unittest
 import uuid
 from uuid import UUID
 
 import pytest
-from unicodedata import category
 
-from app.category import Category
+from app.core.category.domain.category import Category
 
 class TestCategory:
     def test_name_is_required(self):
