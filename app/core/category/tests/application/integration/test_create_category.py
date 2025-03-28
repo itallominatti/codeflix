@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.core.category.infra.in_memory_category_repository import InMemoryCategoryRepository
-from app.core.category.application.create_category import CreateCategory, CreateCategoryRequest, CreateCategoryResponse
+from app.core.category.application.use_cases.create_category import CreateCategory, CreateCategoryRequest, CreateCategoryResponse
 
 class TestCreateCategory:
     def test_create_category_with_valid_data(self):
