@@ -48,7 +48,7 @@ class TestUpdateCategory:
             repository=repository
         )
         request = UpdateCategoryRequest(
-            id="aaaaa",
+            id=uuid.uuid4(),
             name="Série"
         )
 
