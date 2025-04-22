@@ -5,7 +5,7 @@ import pytest
 
 from app.core.category.application.use_cases.create_category import CreateCategory, CreateCategoryRequest, CreateCategoryResponse
 from app.core.category.application.use_cases.create_category import InvalidCategoryData
-from app.core.category.application.category_repository import CategoryRepository
+from app.core.category.domain.category_repository import CategoryRepository
 
 
 class TestCreateCategory:

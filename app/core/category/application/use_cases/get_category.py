@@ -1,10 +1,8 @@
 from uuid import UUID
 from dataclasses import dataclass
 
-from app.core.category.domain.category import Category
-
-from app.core.category.application.exceptions import InvalidCategoryData, CategoryNotFound
-from app.core.category.application.category_repository import CategoryRepository
+from app.core.category.application.exceptions import CategoryNotFound
+from app.core.category.domain.category_repository import CategoryRepository
 
 @dataclass
 class GetCategoryRequest:
