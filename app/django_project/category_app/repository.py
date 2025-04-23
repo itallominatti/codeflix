@@ -17,8 +17,12 @@ class DjangoORMCategoryRepository(CategoryRepository):
             is_active=category.is_active
         )
 
-    def update(self):
-        pass
+    def update(self, category: Category) -> None:
+        self.category_model.objects.filter(pk=category.id).update(
+            name=category.name,
+            description=category.description,
+            is_active=category.is_active,
+        )
 
     def get_by_id(self, id: UUID) -> Category or None:
         try:

@@ -13,6 +13,10 @@ class CategoryOutput:
     is_active: bool
 
 @dataclass
+class ListCategoryRequest:
+    pass
+
+@dataclass
 class ListCategoryResponse:
     data: list[CategoryOutput]
 
