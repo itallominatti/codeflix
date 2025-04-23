@@ -34,7 +34,8 @@ class TestCategoryAPI(APITestCase):
         url = "/api/categories/"
         response = self.client.get(url)
 
-        expected_data = [
+        expected_data = {
+            "data": [
                 {
                     "id": str(category_movie.id),
                     "name": category_movie.name,
@@ -48,6 +49,7 @@ class TestCategoryAPI(APITestCase):
                     "is_active": category_documentary.is_active
                 },
             ]
+        }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, expected_data)
 
@@ -62,8 +64,15 @@ class TestCategoryAPI(APITestCase):
 
         url = f"/api/categories/{category_documentary.id}/"
         response = self.client.get(url)
-        print(category_documentary.id)
-
+        expected_data = {
+            "data": {
+                "id": str(category_documentary.id),
+                "name": "Documentary",
+                "description": "Documentary Description",
+                "is_active": True,
+            }
+        }
+        assert response.data == expected_data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -72,3 +81,37 @@ class TestCategoryAPI(APITestCase):
         url = f'/api/categories/{id}/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_when_payload_is_invalid_then_return_400(self) -> None:
+        url = f'/api/categories/'
+        response = self.client.post(
+            url,
+            data={
+                "name": '',
+                "description": "Movie Description",
+            })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            "name": ["This field may not be blank."]
+        }
+
+    def test_when_payload_is_valid_then_create_category_and_return_201(self) -> None:
+        url = f'/api/categories/'
+        response = self.client.post(
+            url,
+            data={
+            "name": 'Movie',
+            "description": "Movie Description",
+        })
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_when_payload_is_invalid_for_update_view_then_return_400(self) -> None:
+        url = f'/api/categories/123123123/' #UUID inválido
+        response = self.client.put(
+            url,
+            data={
+                "name": '',
+                "description": "Movie Description",
+                # is_active missing
+            })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

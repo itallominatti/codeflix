@@ -31,7 +31,7 @@ class DjangoORMCategoryRepository(CategoryRepository):
                 id=category_orm.id,
                 name=category_orm.name,
                 description=category_orm.description,
-                is_active=category_orm.description
+                is_active=category_orm.is_active
             )
         except self.category_model.DoesNotExist:
             return None
