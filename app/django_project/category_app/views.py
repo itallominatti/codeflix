@@ -9,6 +9,7 @@ from unicodedata import category
 
 from app.core.category.application.exceptions import CategoryNotFound
 from app.core.category.application.use_cases.create_category import CreateCategory, CreateCategoryRequest
+from app.core.category.application.use_cases.delete_category import DeleteCategory, DeleteCategoryRequest
 from app.core.category.application.use_cases.get_category import (
     GetCategory,
     GetCategoryRequest, GetCategoryResponse
@@ -22,7 +23,8 @@ from app.core.category.application.use_cases.update_category import UpdateCatego
 from app.django_project.category_app.repository import DjangoORMCategoryRepository
 from app.django_project.category_app.serializers import ListCategoryResponseSerializer, \
     RetrieveCategoryRequestSerializer, RetrieveCategoryResponseSerializer, CreateCategoryRequestSerializer, \
-    CreateCategoryResponseSerializer, UpdateCategoryRequestSerializer
+    CreateCategoryResponseSerializer, UpdateCategoryRequestSerializer, DeleteCategoryRequestSerializer, \
+    PatchCategoryRequestSerializer
 
 
 # Create your views here.
@@ -79,6 +81,43 @@ class CategoryViewSet(viewsets.ViewSet):
                 **request.data,
                 "id": pk
             })
+        serializer.is_valid(raise_exception=True)
+
+        input = UpdateCategoryRequest(**serializer.validated_data)
+        use_case = UpdateCategory(repository=DjangoORMCategoryRepository())
+        output = use_case.execute(request=input)
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+    @staticmethod
+    def delete(request: Request, pk=None) -> Response:
+        serializer = DeleteCategoryRequestSerializer(
+            data={"id": pk}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        use_case = DeleteCategory(
+            repository=DjangoORMCategoryRepository())
+        try:
+            use_case.execute(request=DeleteCategoryRequest(
+                **serializer.validated_data
+            ))
+        except CategoryNotFound:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+    @staticmethod
+    def patch(request: Request, pk=None) -> Response:
+        serializer = PatchCategoryRequestSerializer(
+            data={
+                **request.data,
+                "id": pk
+            },
+            partial=True)
         serializer.is_valid(raise_exception=True)
 
         input = UpdateCategoryRequest(**serializer.validated_data)
