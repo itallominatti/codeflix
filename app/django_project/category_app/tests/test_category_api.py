@@ -117,6 +117,6 @@ class TestCategoryAPI(APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_when_id_is_not_invalid_for_delete_then_return_400(self) -> None:
-        url = f'/api/categories/123123123'
+        url = f'/api/categories/123123123/'
         response = self.client.delete(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
