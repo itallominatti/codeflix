@@ -18,7 +18,7 @@ class GenreRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, category: Genre) -> None:
+    def update(self, genre: Genre) -> None:
         raise NotImplementedError
 
     @abstractmethod
