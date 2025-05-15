@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from django.db import transaction
+from unicodedata import category
 
 from app.core.genre.domain.genre import Genre
 from app.core.genre.domain.genre_repository import GenreRepository
@@ -23,15 +24,43 @@ class DjangoOrmGenreRepository(GenreRepository):
 
 
     def get_by_id(self, id: UUID) -> Optional[Genre]:
-        ...
+        try:
+            genre_model = Genre.objects.get(id=id)
+        except Genre.DoesNotExist:
+            return None
 
+        return Genre(
+            id= genre_model.id,
+            name=genre_model.name,
+            is_active=genre_model.is_active,
+            categories={category.id for category in genre_model.categories.all()},
+        )
 
     def delete(self, id: UUID) -> None:
-        ...
+        GenreORM.objects.filter(id=id).delete()
 
 
     def update(self, genre: Genre) -> None:
-        ...
+        try:
+            genre_model = GenreORM.objects.get(id=genre.id)
+        except GenreORM.DoesNotExist:
+            return None
+
+        with transaction.atomic():
+            GenreORM.objects.filter(id=genre.id).update(
+                name=genre.name,
+                is_active=genre.is_active,
+            )
+            genre_model.categories.set(genre.categories)
+
+
 
     def list(self) -> list[Genre]:
-        ...
+        return [
+            Genre(
+                id=genre_model.id,
+                name=genre_model.name,
+                is_active=genre_model.is_active,
+                categories={category.id for category in genre_model.categories.all()},
+            ) for genre_model in GenreORM.objects.all()
+        ]
