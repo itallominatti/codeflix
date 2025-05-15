@@ -60,7 +60,8 @@ class UpdateGenre:
         genre_updated = Genre(
             name=current_name,
             is_active=genre.is_active,
-            categories=current_categories
+            categories=current_categories,
+            id=input.id
         )
         self.repository.update(genre_updated)
 

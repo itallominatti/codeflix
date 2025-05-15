@@ -1,8 +1,11 @@
+import uuid
+
 import pytest
 
 
 from rest_framework.test import APIClient
 
+from app.core.genre.application.exceptions import GenreNotFound
 from app.core.genre.domain.genre import Genre
 from app.django_project.category_app.repository import DjangoORMCategoryRepository
 from app.core.category.domain.category import Category
@@ -85,3 +88,49 @@ class TestListAPI:
         }
         assert response.status_code == 200
         assert response.data == expected_response
+
+
+@pytest.mark.django_db
+class TestCreateAPI:
+    def test_create_genre_with_associated_categories(
+            self,
+            category_repository,
+            genre_repository,
+            genre_romance,
+            category_movie,
+    ):
+
+        url = "/api/genres/"
+        data = {
+            "name": "Romance",
+            "is_active": True,
+            "categories": [
+                str(category_movie.id)
+            ]
+        }
+        response = APIClient().post(url, data=data)
+
+        expected_response = {
+            "id": str(genre_romance.id),
+            "name": "Romance",
+            "is_active": True,
+            "categories": [
+                str(category_movie.id)
+            ]
+        }
+        assert response.status_code == 201
+        assert response.data['id']
+        created_genre_id = response.data["id"]
+
+        genre_model = genre_repository.get_by_id(id=created_genre_id)
+        assert genre_model is not None
+
+@pytest.mark.django_db
+class TestDeleteAPI:
+    def test_delete_genre_when_the_genre_does_not_exist(
+        self,
+        genre_repository
+    ):
+        url = f"/api/genres/{uuid.uuid4()}/"
+        response = APIClient().delete(url)
+        assert response.status_code == 404

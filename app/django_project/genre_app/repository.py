@@ -25,8 +25,8 @@ class DjangoOrmGenreRepository(GenreRepository):
 
     def get_by_id(self, id: UUID) -> Optional[Genre]:
         try:
-            genre_model = Genre.objects.get(id=id)
-        except Genre.DoesNotExist:
+            genre_model = GenreORM.objects.get(id=id)
+        except GenreORM.DoesNotExist:
             return None
 
         return Genre(
@@ -47,7 +47,7 @@ class DjangoOrmGenreRepository(GenreRepository):
             return None
 
         with transaction.atomic():
-            GenreORM.objects.filter(id=genre.id).update(
+            GenreORM.objects.filter(id=str(genre.id)).update(
                 name=genre.name,
                 is_active=genre.is_active,
             )
