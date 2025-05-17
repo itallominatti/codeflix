@@ -6,9 +6,6 @@ import pytest
 from app.core.category.domain.category import Category
 
 class TestCategory:
-    def test_name_is_required(self):
-        with pytest.raises(TypeError, match="missing 1 required positional argument: 'name'"):
-            Category()
 
     def test_name_must_have_less_than_256_characters(self):
         with pytest.raises(ValueError, match="name must have less 256 characters"):

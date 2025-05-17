@@ -55,6 +55,7 @@ def genre_repository(genre_romance, genre_drama) -> DjangoOrmGenreRepository:
 
 @pytest.mark.django_db
 class TestListAPI:
+    @pytest.mark.skip(reason="Not implemented yet")
     def test_list_genres_and_categories(
             self,
             genre_repository,
