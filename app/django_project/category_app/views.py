@@ -1,23 +1,19 @@
-from uuid import UUID
-
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
-from unicodedata import category
 
 from app.core.category.application.exceptions import CategoryNotFound
 from app.core.category.application.use_cases.create_category import CreateCategory, CreateCategoryRequest
 from app.core.category.application.use_cases.delete_category import DeleteCategory, DeleteCategoryRequest
 from app.core.category.application.use_cases.get_category import (
     GetCategory,
-    GetCategoryRequest, GetCategoryResponse
+    GetCategoryRequest,
 )
 from app.core.category.application.use_cases.list_category import (
     ListCategoryRequest,
     ListCategory,
-    ListCategoryResponse
+
 )
 from app.core.category.application.use_cases.update_category import UpdateCategory, UpdateCategoryRequest
 from app.django_project.category_app.repository import DjangoORMCategoryRepository
@@ -32,9 +28,14 @@ class CategoryViewSet(viewsets.ViewSet):
 
     @staticmethod
     def list(request: Request) -> Response:
+        order_by = request.query_params.get('order_by', "name")
+        current_page = int(request.query_params.get("current_page", 1))
         input = ListCategoryRequest()
         use_case = ListCategory(repository=DjangoORMCategoryRepository())
-        response = use_case.execute()
+        response = use_case.execute(request=ListCategoryRequest(
+            order_by=order_by,
+            current_page=current_page
+        ))
 
         serializer = ListCategoryResponseSerializer(instance=response)
         return Response(

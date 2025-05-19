@@ -1,26 +1,18 @@
 from dataclasses import dataclass, field
-
-import uuid
-from uuid import UUID
-
-from app.core.category.domain.notification import Notification
-
+from app.core._shared.entity import Entity
 
 @dataclass
-class Category:
+class Category(Entity):
     name: str
     description: str = ""
     is_active: bool = True
-    id: UUID = field(default_factory=uuid.uuid4)
-
-    notification: Notification = field(default_factory=Notification)
 
     def __post_init__(self):
         self.validate()
 
     def validate(self):
         if len(self.name) > 255:
-            self.notification.add_error("name", "name cannot be longer than 255")
+            self.notification.add_error("name", "name must have less 256 characters")
 
         if len(self.name) == 0:
             self.notification.add_error("name", "name cannot be empty")
@@ -36,11 +28,6 @@ class Category:
 
     def __repr__(self):
         return f"<Category {self.name} ({self.id})>"
-
-    def __eq__(self, other):
-        if not isinstance(other, Category):
-            return False
-        return self.id == other.id
 
     def update_category(self, name: str, description: str):
         self.name = name
